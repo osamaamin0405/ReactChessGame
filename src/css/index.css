@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-slate-900;
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+.boarder-container {
+  grid-template-columns: repeat(2, auto);
+  justify-items: flex-end;
+}
+
+.x-notion,
+.y-notion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.y-notion {
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid #fff;
+}
+
+.y-notion span,
+.x-notion span {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  background: #211e1e;
+  color: #fff;
+}
+
+.x-notion {
+  grid-column: -2;
+  width: 100%;
+  border-top: 1px solid #fff;
+}
