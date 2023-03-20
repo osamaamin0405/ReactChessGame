@@ -1,6 +1,6 @@
 import Alliance from "../board/Alliance";
 import Board from "../board/Board";
-import Move from "../move/Move";
+import Move, { KingSideCastleMove, QueenSideCastleMove } from "../move/Move";
 import MoveStatus from "../move/MoveStatus";
 import Piece from "../piece/Piece";
 import TransitionMove from "./TransitionMove";
@@ -25,6 +25,7 @@ export default abstract class Player {
       Player.attacksOnTile(this._king.position, this._opponentLegalMoves.flat())
         .length == 0
     );
+    this.establishCastle();
   }
 
   legalPositions(piecePos: number): number[] {
@@ -109,6 +110,76 @@ export default abstract class Player {
       return new TransitionMove(board, move, MoveStatus.LEAVES_PLAYER_IN_CHECk);
     }
     return new TransitionMove(board, move, MoveStatus.isDone);
+  }
+
+  private establishCastle() {
+    this.QueenSideCastle(56, 58, 59, [57, 58, 59]); // whitePlayer Castle
+    this.KingSideCastle(63, 62, 61, [61, 62]); // whitePlayer Castle
+    this.QueenSideCastle(0, 2, 3, [1, 2, 3]); // blackPlayer Castle
+    this.KingSideCastle(7, 6, 5, [6, 5]); // blackPlayer Castle
+  }
+
+  private CanCastle(
+    rookPos: number,
+    kingCastlePos: number,
+    mustEmptyTile: number[]
+  ): boolean {
+    const rook: Piece = this._board.getTile(rookPos).getPiece();
+    let canCastle = false;
+    if (
+      rook &&
+      rook.isFirstMove &&
+      this._king.isFirstMove &&
+      Player.attacksOnTile(kingCastlePos, this._opponentLegalMoves.flat())
+    ) {
+      for (let tilePosition of mustEmptyTile) {
+        if (this._board.getTile(tilePosition).isOccupied()) {
+          canCastle = false;
+          break;
+        }
+        canCastle = true;
+      }
+    }
+    return canCastle;
+  }
+
+  private QueenSideCastle(
+    rookPos: number,
+    kingCastlePos: number,
+    rookCastlePos: number,
+    mustEmptyTiles: number[]
+  ) {
+    const rook: Piece = this._board.getTile(rookPos).getPiece();
+    if (this.CanCastle(rookPos, kingCastlePos, mustEmptyTiles)) {
+      this._legalMoves.push([
+        new QueenSideCastleMove(
+          this._board,
+          this._king,
+          rook,
+          kingCastlePos,
+          rookCastlePos
+        ),
+      ]);
+    }
+  }
+  private KingSideCastle(
+    rookPos: number,
+    kingCastlePos: number,
+    rookCastlePos: number,
+    mustEmptyTiles: number[]
+  ) {
+    const rook: Piece = this._board.getTile(rookPos).getPiece();
+    if (this.CanCastle(rookPos, kingCastlePos, mustEmptyTiles)) {
+      this._legalMoves.push([
+        new KingSideCastleMove(
+          this._board,
+          this._king,
+          rook,
+          kingCastlePos,
+          rookCastlePos
+        ),
+      ]);
+    }
   }
 
   public abstract getActivePieces(): Piece[];

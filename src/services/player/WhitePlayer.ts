@@ -1,3 +1,4 @@
+import { QueenSideCastleMove } from "./../move/Move";
 import Alliance from "../board/Alliance";
 import Board from "../board/Board";
 import Move from "../move/Move";

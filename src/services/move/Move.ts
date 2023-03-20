@@ -120,7 +120,28 @@ export class PawnJump extends PawnMove {
   }
 }
 
-export class CastleMove extends Move {}
+export class CastleMove extends Move {
+  protected rook;
+  protected rookDist;
+  constructor(
+    board: Board,
+    king: Piece,
+    rook: Piece,
+    kingDist: number,
+    rookDist: number
+  ) {
+    super(board, king, kingDist);
+    this.rook = rook;
+    this.rookDist = rookDist;
+  }
+
+  execute(): Board {
+    const builder = this.executeBuilder();
+    delete builder.boardConfig[this.rook.position];
+    builder.setPiece(this.rook.movePiece(this.rookDist, this.rook.alliance));
+    return builder.build();
+  }
+}
 
 export class KingSideCastleMove extends CastleMove {}
 
