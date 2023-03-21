@@ -3,12 +3,18 @@ import Move, {
   PawnEnPassantMove,
   PawnJump,
   PawnMove,
+  PawnPromotionAttackMove,
+  PawnPromotionMove,
 } from "./../move/Move";
 import Alliance from "../board/Alliance";
 import Board from "../board/Board";
 import Tile from "../board/Tile";
 import Piece from "./Piece";
 import BoardUtils from "../board/BoardUtils";
+import Queen from "./Queen";
+import Bishop from "./Bishop";
+import Rook from "./Rook";
+import Knight from "./Knight";
 
 export default class Pawn extends Piece {
   protected _name: string;
@@ -67,7 +73,11 @@ export default class Pawn extends Piece {
     let candidateTile = board.getTile(distanceCandidate),
       candidateTile2 = board.getTile(distanceCandidate - 8);
     if (currCoordinates == 8 && !candidateTile.isOccupied()) {
-      return new PawnMove(board, this, distanceCandidate);
+      if (this.alliance.isPawnPromotionRow(distanceCandidate)) {
+        return new PawnPromotionMove(board, this, distanceCandidate);
+      } else {
+        return new PawnMove(board, this, distanceCandidate);
+      }
     } else if (
       currCoordinates == 16 &&
       this._isFirstMove &&
@@ -91,7 +101,11 @@ export default class Pawn extends Piece {
       candidateTile.isOccupied() &&
       candidateTilePiece.alliance.name != this.alliance.name
     ) {
-      return new PawnAttack(board, this, distanceCandidate);
+      if (this.alliance.isPawnPromotionRow(distanceCandidate)) {
+        return new PawnPromotionAttackMove(board, this, distanceCandidate);
+      } else {
+        return new PawnAttack(board, this, distanceCandidate);
+      }
     }
     throw new Error("None Attack Move");
   }
@@ -130,6 +144,25 @@ export default class Pawn extends Piece {
     }
 
     return [board.getTile(this.position + 1), board.getTile(this.position - 1)];
+  }
+
+  public establishPromotion(
+    promoterPiece: string,
+    distanceCandidates: number,
+    alliance: Alliance
+  ): Piece {
+    switch (promoterPiece.toLowerCase()) {
+      case "q":
+        return new Queen(distanceCandidates, alliance, false);
+      case "b":
+        return new Bishop(distanceCandidates, alliance, false);
+      case "r":
+        return new Rook(distanceCandidates, alliance, false);
+      case "n":
+        return new Knight(distanceCandidates, alliance, false);
+      default:
+        return new Queen(distanceCandidates, alliance, false);
+    }
   }
 
   public createInstance(): Piece {

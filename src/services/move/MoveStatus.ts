@@ -14,6 +14,8 @@ abstract class MoveStatus {
         return "Can't Lave Kin On Check";
       case 3:
         return "Game Over";
+      case 4:
+        return "Select Pawn Promotion";
     }
   }
 }

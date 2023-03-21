@@ -42,3 +42,22 @@ body {
   width: 100%;
   border-top: 1px solid #fff;
 }
+.chess-board-pace .grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 30px);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  border: 2px solid #474545;
+}
+
+.chess-board-pace .grid > div {
+  cursor: pointer;
+}
+
+.chess-board-pace .grid > div:nth-child(1) {
+  background-color: rgb(85, 85, 85);
+}
+.chess-board-pace .grid > div:nth-child(4) {
+  background-color: rgb(85, 85, 85);
+}

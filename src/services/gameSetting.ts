@@ -21,7 +21,7 @@ const availableBoardColors: AvailableBoardColors = {
   },
 };
 
-class ThemeSettings {
+export class ThemeSettings {
   private PiecePrefixImageUrl: string;
   private PiecePostfixImageUrl: string;
   private boardColors: AvailableBoardColors;

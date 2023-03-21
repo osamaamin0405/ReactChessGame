@@ -6,10 +6,13 @@ export default abstract class Move {
   protected board: Board;
   protected _piece: Piece;
   protected distanceCoordinates: number;
+  public type: string;
+  promotedPiece: string = "q";
   constructor(board: Board, piece: Piece, distanceCoordinates: number) {
     this.board = board;
     this._piece = piece;
     this.distanceCoordinates = distanceCoordinates;
+    this.type = "";
   }
 
   getDestinationCoordinates(): number {
@@ -22,17 +25,6 @@ export default abstract class Move {
   get piece() {
     return this._piece;
   }
-
-  // executeV1(builder: Builder): Board {
-  //   // builder.setPiece(
-  //   //   this._piece.movePiece(
-  //   //     this.getDestinationCoordinates(),
-  //   //     this._piece.alliance
-  //   //   )
-  //   // );
-  //   // builder.setMoveMaker(this.board.currPlayer.getOpponent().getAlliance());
-  //   // return builder.build();
-  // }
 
   public get currCoordinate(): number {
     return this._piece.position;
@@ -120,6 +112,20 @@ export class PawnJump extends PawnMove {
   }
 }
 
+export class PawnPromotionMove extends PawnMove {
+  type = "p";
+  execute(): Board {
+    const builder = this.executeBuilder();
+    let newPiece = this.piece.establishPromotion(
+      this.promotedPiece,
+      this.distanceCoordinates,
+      this.piece.alliance
+    );
+    builder.setPiece(newPiece);
+    return builder.build();
+  }
+}
+export class PawnPromotionAttackMove extends PawnPromotionMove {}
 export class CastleMove extends Move {
   protected rook;
   protected rookDist;

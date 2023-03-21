@@ -1,4 +1,5 @@
 import Player from "../player/Player";
+import BoardUtils from "./BoardUtils";
 
 export default abstract class Alliance {
   abstract getDirection(): number;
@@ -6,6 +7,7 @@ export default abstract class Alliance {
   abstract get name(): string;
   abstract get isWhite(): boolean;
   abstract get isBlack(): boolean;
+  abstract isPawnPromotionRow(position: number): boolean;
   abstract chosePlayer(whitePlayer: Player, blackPlayer: Player): Player;
   public equals(obj: any): boolean {
     return obj instanceof Alliance && obj.name === this._name;
@@ -13,6 +15,9 @@ export default abstract class Alliance {
 }
 
 export class White extends Alliance {
+  isPawnPromotionRow(position: number): boolean {
+    return BoardUtils.isSameRow(0, position);
+  }
   chosePlayer(whitePlayer: Player, _: Player): Player {
     return whitePlayer;
   }
@@ -35,6 +40,9 @@ export class White extends Alliance {
 }
 
 export class Black extends Alliance {
+  isPawnPromotionRow(position: number): boolean {
+    return BoardUtils.isSameRow(56, position);
+  }
   chosePlayer(_: Player, blackPlayer: Player): Player {
     return blackPlayer;
   }

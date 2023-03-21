@@ -3,6 +3,7 @@ type BoardPiece = {
   pieceProps: BoardPieceProps;
   children: React.Children;
   movFunction: CallableFunction;
+  onPromote?: CallableFunction;
 };
 
 type ThemeName =

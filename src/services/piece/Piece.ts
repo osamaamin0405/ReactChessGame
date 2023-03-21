@@ -1,6 +1,10 @@
 import Alliance from "../board/Alliance";
 import Board from "../board/Board";
 import Move from "../move/Move";
+import Bishop from "./Bishop";
+import Knight from "./Knight";
+import Queen from "./Queen";
+import Rook from "./Rook";
 
 export default abstract class Piece {
   protected _isFirstMove: boolean;
@@ -55,6 +59,14 @@ export default abstract class Piece {
       );
     }
     return false;
+  }
+
+  establishPromotion(
+    promotedPiece: string,
+    distanceCoordinates: number,
+    alliance: Alliance
+  ): Piece {
+    throw new Error("overrides on Pawn");
   }
 
   public abstract createInstance(): Piece;
