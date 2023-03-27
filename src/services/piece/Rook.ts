@@ -7,6 +7,7 @@ import Piece from "./Piece";
 import Alliance from "../board/Alliance";
 
 export default class Rook extends Piece {
+  protected _value: number = 500;
   protected _name: string;
   private static candidateCoordinates: Array<number> = [1, -1, 8, -8];
 

@@ -17,6 +17,7 @@ import Rook from "./Rook";
 import Knight from "./Knight";
 
 export default class Pawn extends Piece {
+  protected _value: number = 100;
   protected _name: string;
   private static candidateCoordinates: Array<number> = [8, 16, 7, 9];
   constructor(

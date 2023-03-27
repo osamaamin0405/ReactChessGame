@@ -6,6 +6,7 @@ import Tile from "../board/Tile";
 import Piece from "./Piece";
 
 export default class Knight extends Piece {
+  protected _value: number = 300;
   protected _name: string;
   private static candidateCoordinates: Array<number> = [
     -17, -15, -10, -6, 17, 15, 10, 6,

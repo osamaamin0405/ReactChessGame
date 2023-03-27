@@ -142,9 +142,10 @@ export class CastleMove extends Move {
   }
 
   execute(): Board {
-    const builder = this.executeBuilder();
+    const builder: Builder = this.executeBuilder();
     delete builder.boardConfig[this.rook.position];
     builder.setPiece(this.rook.movePiece(this.rookDist, this.rook.alliance));
+    this.board.currPlayer.isCastled = true;
     return builder.build();
   }
 }

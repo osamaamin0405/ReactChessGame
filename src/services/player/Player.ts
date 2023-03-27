@@ -11,7 +11,7 @@ export default abstract class Player {
   protected _opponentLegalMoves: Move[][];
   protected _king: Piece;
   private _isInCheck: boolean;
-  private _isInCheckMate: boolean;
+  private _isCastled: boolean = false;
   constructor(
     board: Board,
     legalMoves: Move[][],
@@ -91,8 +91,12 @@ export default abstract class Player {
   }
 
   // TODO: implement this methods below
-  public isCastled() {
-    return false;
+  public get isCastled() {
+    return this._isCastled;
+  }
+
+  public set isCastled(value: boolean) {
+    this._isCastled = value;
   }
 
   public makMove(move: Move): TransitionMove {

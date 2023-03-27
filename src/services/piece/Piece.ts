@@ -12,6 +12,7 @@ export default abstract class Piece {
 
   protected piecePosition: number;
   protected _alliance: Alliance;
+  protected abstract _value: number;
 
   constructor(
     piecePosition: number,
@@ -21,6 +22,10 @@ export default abstract class Piece {
     this.piecePosition = piecePosition;
     this._alliance = alliance;
     this._isFirstMove = isFirstMove;
+  }
+
+  public get value(): number {
+    return this._value;
   }
 
   public get position(): number {

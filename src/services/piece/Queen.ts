@@ -7,6 +7,7 @@ import Piece from "./Piece";
 import Alliance from "../board/Alliance";
 
 export default class Queen extends Piece {
+  protected _value: number = 900;
   protected _name: string;
   private static candidateCoordinates: Array<number> = [
     -9, 9, -7, 7, 1, -1, 8, -8,

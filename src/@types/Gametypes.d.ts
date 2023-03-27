@@ -51,12 +51,6 @@ type PieceProps = {
   onDragEnd?: CallableFunction;
 };
 
-interface Player {
-  name: string;
-  isAi: boolean;
-  isWhite?: boolean;
-}
-
 type ChessGameProps = {
   theme?: string;
   isAi: boolean;
