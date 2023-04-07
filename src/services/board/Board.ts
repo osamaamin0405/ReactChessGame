@@ -23,8 +23,8 @@ export default class Board {
   private _whitePlayer: Player;
   private _blackPlayer: Player;
   private _currPlayer: Player;
-  private _whiteLegalMoves: Move[][];
-  private _blackLegalMoves: Move[][];
+  private _whiteLegalMoves: Move[];
+  private _blackLegalMoves: Move[];
 
   constructor(builder: Builder) {
     this.builder = builder;
@@ -52,21 +52,29 @@ export default class Board {
     );
   }
 
-  public getLegalMoves(activePieces: Piece[]): Move[][] {
-    let legalMoves: Move[][] = [];
+  public getLegalMoves(activePieces: Piece[]): Move[] {
+    let legalMoves: Move[] = [];
     for (let piece of activePieces) {
-      legalMoves.push(piece.getLegalMoves(this));
+      legalMoves.push(...piece.getLegalMoves(this));
     }
     return legalMoves;
   }
 
   public toString(): string {
-    let gameBoard: string = ``;
+    let gameBoard: string = "";
     for (let i = 0; i < BoardUtils.TILES_CELLS; i++) {
       gameBoard += ` ${this.gameBoard[i].getPiece()?.toString() || "_"} `;
-      if ((i + 1) % BoardUtils.NUM_COLS == 0) gameBoard += "\n";
+      if ((i + 1) % BoardUtils.NUM_COLS == 0) gameBoard += `\n`;
     }
     return gameBoard;
+  }
+
+  public get isGameOver(): boolean {
+    return this.whitePlayer.isInCheckMate() || this.blackPlayer.isInCheckMate();
+  }
+
+  public get allActivePieces(): Piece[] {
+    return this._whitePieces.concat(this._blackPieces);
   }
 
   private getActivePieces(alliance: Alliance): Piece[] {
@@ -143,7 +151,7 @@ export default class Board {
   }
 
   public get getAllLegalMove(): Move[] {
-    return this._whiteLegalMoves.flat().concat(this._blackLegalMoves.flat());
+    return this._whiteLegalMoves.concat(this._blackLegalMoves);
   }
 
   public get enPassantPawn(): Piece {

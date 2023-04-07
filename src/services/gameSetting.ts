@@ -1,12 +1,8 @@
 export default class ChessGame {
   public theme: ThemeSettings;
-  private playerOne: Player;
-  private playerTwo: Player;
 
-  constructor(themeName: ThemeName, playerOne: Player, playerTwo: Player) {
+  constructor(themeName: ThemeName) {
     this.theme = new ThemeSettings(themeName);
-    this.playerOne = playerOne;
-    this.playerTwo = playerTwo;
   }
 }
 

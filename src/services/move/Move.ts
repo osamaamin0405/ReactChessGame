@@ -57,6 +57,13 @@ export default abstract class Move {
     return builder;
   }
 
+  isAttack() {
+    return false;
+  }
+  get attackedPiece(): Piece {
+    return null;
+  }
+
   execute(): Board {
     const builder = this.executeBuilder();
     return builder.build();
@@ -72,6 +79,13 @@ export class MajorMove extends Move {
 export class AttackMove extends Move {
   constructor(board: Board, piece: Piece, distanceCoordinates: number) {
     super(board, piece, distanceCoordinates);
+  }
+  isAttack(): boolean {
+    return true;
+  }
+
+  get attackedPiece(): Piece {
+    return this.board.getTile(this.distanceCoordinates).getPiece();
   }
 }
 
@@ -100,6 +114,10 @@ export class PawnEnPassantMove extends PawnAttack {
     delete builder.boardConfig[this.attackedPawn.position];
     return builder.build();
   }
+
+  get attackedPiece(): Piece {
+    return this.attackedPawn;
+  }
 }
 
 export class PawnJump extends PawnMove {
@@ -125,7 +143,14 @@ export class PawnPromotionMove extends PawnMove {
     return builder.build();
   }
 }
-export class PawnPromotionAttackMove extends PawnPromotionMove {}
+export class PawnPromotionAttackMove extends PawnPromotionMove {
+  isAttack(): boolean {
+    return true;
+  }
+  get attackedPiece(): Piece {
+    return this.board.getTile(this.distanceCoordinates).getPiece();
+  }
+}
 export class CastleMove extends Move {
   protected rook;
   protected rookDist;

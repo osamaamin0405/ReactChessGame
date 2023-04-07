@@ -5,11 +5,7 @@ import Piece from "../piece/Piece";
 import Player from "./Player";
 
 export default class BlackPlayer extends Player {
-  constructor(
-    board: Board,
-    legalMoves: Move[][],
-    opponentLegalMoves: Move[][]
-  ) {
+  constructor(board: Board, legalMoves: Move[], opponentLegalMoves: Move[]) {
     super(board, legalMoves, opponentLegalMoves);
   }
 

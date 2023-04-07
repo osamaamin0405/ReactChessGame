@@ -7,22 +7,18 @@ import TransitionMove from "./TransitionMove";
 
 export default abstract class Player {
   protected _board: Board;
-  protected _legalMoves: Move[][];
-  protected _opponentLegalMoves: Move[][];
+  protected _legalMoves: Move[];
+  protected _opponentLegalMoves: Move[];
   protected _king: Piece;
   private _isInCheck: boolean;
   private _isCastled: boolean = false;
-  constructor(
-    board: Board,
-    legalMoves: Move[][],
-    opponentLegalMoves: Move[][]
-  ) {
+  constructor(board: Board, legalMoves: Move[], opponentLegalMoves: Move[]) {
     this._board = board;
     this._legalMoves = legalMoves;
     this._opponentLegalMoves = opponentLegalMoves;
     this._king = this.establishKing();
     this._isInCheck = !(
-      Player.attacksOnTile(this._king.position, this._opponentLegalMoves.flat())
+      Player.attacksOnTile(this._king.position, this._opponentLegalMoves)
         .length == 0
     );
     this.establishCastle();
@@ -30,7 +26,7 @@ export default abstract class Player {
 
   legalPositions(piecePos: number): number[] {
     const legalPositions: number[] = [];
-    for (let move of this._legalMoves.flat()) {
+    for (let move of this._legalMoves) {
       if (move.currCoordinate == piecePos)
         legalPositions.push(move.destinationCoordinate);
     }
@@ -60,11 +56,11 @@ export default abstract class Player {
   }
 
   isLegalMove(move: Move): boolean {
-    return this._legalMoves.flat().includes(move);
+    return this._legalMoves.includes(move);
   }
 
   private hasEscapeMove(): boolean {
-    for (let move of this._legalMoves.flat()) {
+    for (let move of this._legalMoves) {
       let moveTransition = this.makMove(move);
       if (moveTransition.status == 0) {
         return true;
@@ -86,7 +82,7 @@ export default abstract class Player {
     return this._king;
   }
 
-  public get legalMoves(): Move[][] {
+  public get legalMoves(): Move[] {
     return this._legalMoves;
   }
 
@@ -105,10 +101,9 @@ export default abstract class Player {
     }
 
     const board: Board = move.execute();
-    console.log(board.toString());
     const attacksOnKing = Player.attacksOnTile(
       board.currPlayer.getOpponent().king.position,
-      board.currPlayer.legalMoves.flat()
+      board.currPlayer.legalMoves
     );
     if (!(attacksOnKing.length == 0)) {
       return new TransitionMove(board, move, MoveStatus.LEAVES_PLAYER_IN_CHECk);
@@ -134,7 +129,7 @@ export default abstract class Player {
       rook &&
       rook.isFirstMove &&
       this._king.isFirstMove &&
-      Player.attacksOnTile(kingCastlePos, this._opponentLegalMoves.flat())
+      Player.attacksOnTile(kingCastlePos, this._opponentLegalMoves)
     ) {
       for (let tilePosition of mustEmptyTile) {
         if (this._board.getTile(tilePosition).isOccupied()) {
@@ -155,15 +150,15 @@ export default abstract class Player {
   ) {
     const rook: Piece = this._board.getTile(rookPos).getPiece();
     if (this.CanCastle(rookPos, kingCastlePos, mustEmptyTiles)) {
-      this._legalMoves.push([
+      this._legalMoves.push(
         new QueenSideCastleMove(
           this._board,
           this._king,
           rook,
           kingCastlePos,
           rookCastlePos
-        ),
-      ]);
+        )
+      );
     }
   }
   private KingSideCastle(
@@ -174,15 +169,15 @@ export default abstract class Player {
   ) {
     const rook: Piece = this._board.getTile(rookPos).getPiece();
     if (this.CanCastle(rookPos, kingCastlePos, mustEmptyTiles)) {
-      this._legalMoves.push([
+      this._legalMoves.push(
         new KingSideCastleMove(
           this._board,
           this._king,
           rook,
           kingCastlePos,
           rookCastlePos
-        ),
-      ]);
+        )
+      );
     }
   }
 

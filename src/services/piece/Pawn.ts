@@ -123,7 +123,6 @@ export default class Pawn extends Piece {
           const calculateDistanceCoordinate = Math.abs(
             board.enPassantPawn.position * this.alliance.getDirection() + 8
           );
-          console.log(calculateDistanceCoordinate);
           return new PawnEnPassantMove(
             board,
             this,

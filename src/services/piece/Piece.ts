@@ -31,6 +31,25 @@ export default abstract class Piece {
   public get position(): number {
     return this.piecePosition;
   }
+
+  XYPosition(): [string, number] {
+    const row = Math.floor(this.position / 8) + 1;
+    const col = String.fromCharCode(97 + (this.position % 8));
+    return [col, row];
+  }
+
+  get row(): number {
+    return Math.floor(this.position / 8);
+  }
+
+  get col(): number {
+    return this.position % 8;
+  }
+
+  getPosition(row: number, col: number): number {
+    return row * 8 + col;
+  }
+
   getAlliance(): string {
     return this._alliance.name;
   }
@@ -62,6 +81,13 @@ export default abstract class Piece {
         this.position == obj.position &&
         this.name == this.name
       );
+    }
+    return false;
+  }
+
+  public isSibling(obj: any): boolean {
+    if (obj instanceof Piece) {
+      return this.alliance.name == obj.alliance.name && this.name == this.name;
     }
     return false;
   }

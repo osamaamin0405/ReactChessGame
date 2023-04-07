@@ -9,6 +9,7 @@ import Board from '../services/board/Board';
 import Move, { PawnPromotionMove } from '../services/move/Move';
 import MoveStatus from '../services/move/MoveStatus';
 import PromotedBox from '../components/PromotedBox';
+import MinMax from '../services/Ai/MinMAx';
 const notionXKeys = ["A", "B", "C", "D", "E", "F", "G", "H"],
   notionYKeys = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
@@ -24,10 +25,14 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
   private gameSetting: ChessGame;
   private boardColor: BoardColor;
   gameServices: Chess;
+  private AI: MinMax;
   constructor(props: ChessGameProps) {
     super(props);
     
-    this.gameSetting = new ChessGame("gray_shadow", { name: 'osama', isAi: false }, { name: 'Ai', isAi: true });
+    this.gameSetting = new ChessGame("gray_shadow");
+    this.AI = new MinMax(3);
+    // window.ai = MinMax;
+    // window.evaluate = this.aiPlay.bind(this);
     this.gameServices = new Chess();
     this.boardColor = this.gameSetting.theme.getBoardColor();
     this.state = {
@@ -38,12 +43,25 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
     }
   }
 
+  aiPlay(ai:MinMax){
+    let newBoard = this.state.chessBoard;
+    while(!newBoard.isGameOver){
+      const bestMove = ai.execute(newBoard);
+      const moveTransition = newBoard.currPlayer.makMove(bestMove);
+      if(moveTransition.status == MoveStatus.isDone){
+
+        newBoard = moveTransition.board;
+      }
+      console.log(newBoard.toString())
+    }
+  }
+
 
   move(currPosition: number, candidatePosition: number) {
     if(this.state.chessBoard.currPlayer.isInCheckMate()){
       console.log(MoveStatus.getState(3));
     }
-    let pieceLegalMoves: Move[] = this.state.chessBoard.currPlayer.legalMoves.flat();
+    let pieceLegalMoves: Move[] = this.state.chessBoard.currPlayer.legalMoves;
     for (let move of pieceLegalMoves) {
       if (currPosition == move.currCoordinate && move.destinationCoordinate == candidatePosition) {
         if(move.type == "p")
@@ -54,12 +72,27 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
           let moveTransition = this.state.chessBoard.currPlayer.makMove(move);
           if (moveTransition.status == MoveStatus.isDone) {
             this.setState({ chessBoard: moveTransition.board });
+            break;
           }
         }
       }
     }
+    //console.log(this.AI.execute(this.state.chessBoard));
+    // window.board = this.state.chessBoard;
   }
 
+  componentDidUpdate(prevProps: Readonly<ChessGameProps>, prevState: Readonly<ChessGameState>, snapshot?: any): void {
+    //window.board = this.state.chessBoard;
+      if(this.state.chessBoard.currPlayer.getAlliance().isBlack){
+        setTimeout(()=>{
+          let bestMove = this.AI.execute(this.state.chessBoard),
+          transitionMove = this.state.chessBoard.currPlayer.makMove(bestMove);
+          if(transitionMove.status == MoveStatus.isDone){
+            this.setState({ chessBoard: transitionMove.board });
+          }
+        }, 0)
+      }
+  }
 
   promoterMove(pieceName: string){
     let promotedMove: Move = this.state.promotedMove;
@@ -111,7 +144,6 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
                 this.state.chessBoard.getGameBoard.map((e, i) => {
                   return <TilePiece
                     key={i + 1}
-                    
                     pieceProps={{
                       width: "60px",
                       height: "60px",

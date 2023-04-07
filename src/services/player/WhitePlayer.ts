@@ -6,11 +6,7 @@ import Piece from "../piece/Piece";
 import Player from "./Player";
 
 export default class WhitePlayer extends Player {
-  constructor(
-    board: Board,
-    legalMoves: Move[][],
-    opponentLegalMoves: Move[][]
-  ) {
+  constructor(board: Board, legalMoves: Move[], opponentLegalMoves: Move[]) {
     super(board, legalMoves, opponentLegalMoves);
   }
 

@@ -5,6 +5,8 @@ export default abstract class BoardUtils {
   static isEighthColumn: boolean[] = BoardUtils.initColumns(7);
   static TILES_CELLS: number = 64;
   static NUM_COLS: number = 8;
+  static notionXKeys = ["A", "B", "C", "D", "E", "F", "G", "H"];
+  static notionYKeys = ["1", "2", "3", "4", "5", "6", "7", "8"];
   private constructor() {
     throw new Error("BoardUtils cannot be instantiated", {});
   }
