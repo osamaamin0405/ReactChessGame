@@ -3,7 +3,7 @@ import Move from "../move/Move";
 import MoveStatus from "../move/MoveStatus";
 import ChessBoardEvaluator from "./AdvancedEvaluator";
 import BoardEvaluate from "./BoardEvaluate";
-import MoveStrategy from "./MoveStartegy";
+import MoveStrategy from "./MoveStrategy";
 import StanderBoardEvaluate from "./StanderBoardEvaluate";
 
 export default class MinMax implements MoveStrategy {
@@ -11,7 +11,7 @@ export default class MinMax implements MoveStrategy {
   private readonly depth: number;
 
   constructor(searchDepth: number) {
-    this.boardEvaluator = new ChessBoardEvaluator();
+    this.boardEvaluator = new StanderBoardEvaluate();
     this.depth = searchDepth;
   }
 

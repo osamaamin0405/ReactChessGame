@@ -2,7 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+:root {
+  --of-white: rgba(238, 239, 239, 1);
+  --black-blue: rgba(28, 44, 52, 1);
+  --main-yellow: rgba(228, 172, 60, 1);
+  --skay-blue: rgba(63, 187, 184, 1);
+  --spectra: rgba(44, 81, 90, 1);
+  --dark-skay: rgb(13 35 40);
+  font-family: "open sans", sans-serif;
+}
+
+#root {
   @apply bg-slate-900;
   min-width: 100vw;
   min-height: 100vh;
@@ -60,4 +70,47 @@ body {
 }
 .chess-board-pace .grid > div:nth-child(4) {
   background-color: rgb(85, 85, 85);
+}
+
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  @apply font-bold;
+}
+
+.chosePlayerBtn {
+  @apply w-2/4 m-1 rounded-md text-xl p-2 text-slate-300 hover:text-slate-950 transition uppercase;
+}
+
+.secondary-btn {
+  @apply m-1 rounded-md text-xl p-2 text-slate-300 hover:text-slate-950 transition uppercase;
+}
+
+.main-btn {
+  box-shadow: 1px 7px 8px var(--dark-skay);
+  width: 100px;
+  height: 100px;
+  font-size: 3rem;
+  border-radius: 15px;
+}
+
+.box {
+  @apply flex flex-col gap-2 justify-center bg-slate-800 shadow-lg rounded-lg;
+}
+
+.input {
+  @apply bg-slate-800 outline-0 resize-none p-2 text-lg text-slate-200;
+}
+
+.chess-board {
+  grid-template-columns: repeat(8, 60px);
+}
+
+.chess-engine {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-content: center;
+  align-content: center;
 }

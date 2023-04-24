@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import { DndProvider } from 'react-dnd';
 import TilePiece from '../components/TilePiece'
 import ChessPiece from '../components/ChessPiece';
@@ -6,10 +6,11 @@ import ChessGame from '../services/gameSetting';
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import Chess from '../services/Chess';
 import Board from '../services/board/Board';
-import Move, { PawnPromotionMove } from '../services/move/Move';
+import Move from '../services/move/Move';
 import MoveStatus from '../services/move/MoveStatus';
 import PromotedBox from '../components/PromotedBox';
 import MinMax from '../services/Ai/MinMAx';
+import Btn from './Btn';
 const notionXKeys = ["A", "B", "C", "D", "E", "F", "G", "H"],
   notionYKeys = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
@@ -20,19 +21,23 @@ type ChessGameState = {
   promotedBox: boolean,
   promotedMove: Move,
 }
+
+type ChessGameProps = {
+  theme?: string;
+  isAi: boolean;
+  playerOne: string;
+};
+
 export default class Home extends Component<ChessGameProps, ChessGameState> {
 
   private gameSetting: ChessGame;
   private boardColor: BoardColor;
-  gameServices: Chess;
+  private gameServices: Chess;
   private AI: MinMax;
   constructor(props: ChessGameProps) {
     super(props);
-    
     this.gameSetting = new ChessGame("gray_shadow");
     this.AI = new MinMax(3);
-    // window.ai = MinMax;
-    // window.evaluate = this.aiPlay.bind(this);
     this.gameServices = new Chess();
     this.boardColor = this.gameSetting.theme.getBoardColor();
     this.state = {
@@ -43,18 +48,17 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
     }
   }
 
-  aiPlay(ai:MinMax){
-    let newBoard = this.state.chessBoard;
-    while(!newBoard.isGameOver){
-      const bestMove = ai.execute(newBoard);
-      const moveTransition = newBoard.currPlayer.makMove(bestMove);
-      if(moveTransition.status == MoveStatus.isDone){
+  // aiPlay(ai:MinMax){
+  //   let newBoard = this.state.chessBoard;
+  //   while(!newBoard.isGameOver){
+  //     const bestMove = ai.execute(newBoard);
+  //     const moveTransition = newBoard.currPlayer.makMove(bestMove);
+  //     if(moveTransition.status == MoveStatus.isDone){
 
-        newBoard = moveTransition.board;
-      }
-      console.log(newBoard.toString())
-    }
-  }
+  //       newBoard = moveTransition.board;
+  //     }
+  //   }
+  // }
 
 
   move(currPosition: number, candidatePosition: number) {
@@ -77,22 +81,9 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
         }
       }
     }
-    //console.log(this.AI.execute(this.state.chessBoard));
-    // window.board = this.state.chessBoard;
+
   }
 
-  componentDidUpdate(prevProps: Readonly<ChessGameProps>, prevState: Readonly<ChessGameState>, snapshot?: any): void {
-    //window.board = this.state.chessBoard;
-      if(this.state.chessBoard.currPlayer.getAlliance().isBlack){
-        setTimeout(()=>{
-          let bestMove = this.AI.execute(this.state.chessBoard),
-          transitionMove = this.state.chessBoard.currPlayer.makMove(bestMove);
-          if(transitionMove.status == MoveStatus.isDone){
-            this.setState({ chessBoard: transitionMove.board });
-          }
-        }, 0)
-      }
-  }
 
   promoterMove(pieceName: string){
     let promotedMove: Move = this.state.promotedMove;
@@ -101,7 +92,6 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
     if (moveTransition.status == MoveStatus.isDone) {
       this.setState({ chessBoard: moveTransition.board, promotedBox:false, promotedMove:null });
     }
-    
   }
 
   onDragStart(props:PieceProps){
@@ -130,49 +120,49 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
             />
           )
         }
-        <div className='boarder-container grid'>
-          <div className='y-notion'>
-            {
-              notionYKeys.map((v) => {
-                return <span key={v}>{v}</span>
-              })
-            }
+        <div className='chess-engine'>
+            <div className='fen-input flex  items-center gap-2'>
+              <input className='input my-5 grow' placeholder='FEN file formate'/>
+              <Btn className='secondary-btn bg-sky-800 px-4 w-[200px]'>Apply</Btn>
+            </div>
+            <div className='chess-board-engine flex gap-2'>
+              <div className='chess-board grid'>
+                <DndProvider backend={HTML5Backend}>
+                  {
+                    this.state.chessBoard.getGameBoard.map((e, i) => {
+                      return <TilePiece
+                        key={i + 1}
+                        pieceProps={{
+                          width: "60px",
+                          height: "60px",
+                          color: this.setTileColor(i),
+                          index: i,
+                        }}
+                        movFunction={this.move.bind(this)}
+                      >
+                        <ChessPiece
+                          position={i}
+                          piece={e.getPiece()}
+                          onDragStart={this.onDragStart.bind(this)}
+                          onDragEnd = {this.onDragEnd.bind(this)}
+                          image={e.isOccupied() ? this.gameSetting.theme.getPieceImage(e.getPiece().toString()) : ''}
+                        ></ChessPiece>
+                      </TilePiece>
+                    })
+                  }
+                </DndProvider>
+              </div>
+              <div className='moves-history '>
+                <textarea
+                className
+                  ='input h-full'
+                placeholder='Moves Log'
+                disabled
+              ></textarea>
+              </div>
+            </div>
           </div>
-          <div className='grid' style={{ gridTemplateColumns: "repeat(8, 60px)" }}>
-            <DndProvider options={{ondrag: ()=>{console.log("d")}}} backend={HTML5Backend}>
-              {
-                this.state.chessBoard.getGameBoard.map((e, i) => {
-                  return <TilePiece
-                    key={i + 1}
-                    pieceProps={{
-                      width: "60px",
-                      height: "60px",
-                      color: this.setTileColor(i),
-                      index: i,
-
-                    }}
-                    movFunction={this.move.bind(this)}
-                  >
-                    <ChessPiece
-                      position={i}
-                      piece={e.getPiece()}
-                      onDragStart={this.onDragStart.bind(this)}
-                      onDragEnd = {this.onDragEnd.bind(this)}
-                      image={e.isOccupied() ? this.gameSetting.theme.getPieceImage(e.getPiece().toString()) : ''}
-                    ></ChessPiece>
-                  </TilePiece>
-                })
-              }
-            </DndProvider>
-          </div>
-          <div className='x-notion'>
-            {
-              notionXKeys.map((v) => {
-                return <span key={v}>{v}</span>
-              })
-            }
-          </div>
-        </div>
+          
       </>
     );
   }

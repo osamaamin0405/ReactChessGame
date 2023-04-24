@@ -1,7 +1,7 @@
 import Move from "../move/Move";
 
 export default class SearchController {
-  private nodes: [];
+  private nodes: number;
   private fh: any;
   private fhf: any;
   private time: string;
@@ -11,6 +11,13 @@ export default class SearchController {
   private best: Move;
   private depth: number;
   constructor() {}
+
+  private alphaBeta(alpha: number, beta: number, depth: number) {
+    if (depth == 0) {
+      // run evaluation
+    }
+    this.nodes++;
+  }
 
   private searchPosition() {
     let bestMove,

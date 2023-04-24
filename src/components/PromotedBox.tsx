@@ -1,4 +1,3 @@
-import React from 'react'
 import Alliance from '../services/board/Alliance'
 import {ThemeSettings} from '../services/gameSetting'
 
@@ -23,7 +22,7 @@ export default function PromotedBox(props: PromotedBoxProps){
               <div 
               key={name}
               className='
-              w-20 h-20 bg-no-repeat cursor-pointer  bg-[length:80%] bg-center mx-2
+                w-20 h-20 bg-no-repeat cursor-pointer  bg-[length:80%] bg-center mx-2
               ' 
               style={
                 {backgroundImage: `url('${props.theme.getPieceImage(name).toString()}')`}

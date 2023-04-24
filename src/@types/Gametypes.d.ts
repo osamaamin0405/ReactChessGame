@@ -51,9 +51,4 @@ type PieceProps = {
   onDragEnd?: CallableFunction;
 };
 
-type ChessGameProps = {
-  theme?: string;
-  isAi: boolean;
-};
-
 type ChessBoard = (ChessPiece | null)[][];
