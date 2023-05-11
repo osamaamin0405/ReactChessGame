@@ -12,6 +12,7 @@ export default abstract class Player {
   protected _king: Piece;
   private _isInCheck: boolean;
   private _isCastled: boolean = false;
+  public abstract  getAvailableCastle(): string;
   constructor(board: Board, legalMoves: Move[], opponentLegalMoves: Move[]) {
     this._board = board;
     this._legalMoves = legalMoves;
@@ -23,6 +24,8 @@ export default abstract class Player {
     );
     this.establishCastle();
   }
+
+
 
   legalPositions(piecePos: number): number[] {
     const legalPositions: number[] = [];
@@ -62,7 +65,7 @@ export default abstract class Player {
   private hasEscapeMove(): boolean {
     for (let move of this._legalMoves) {
       let moveTransition = this.makMove(move);
-      if (moveTransition.status == 0) {
+      if (moveTransition.status == MoveStatus.isDone) {
         return true;
       }
     }
@@ -118,7 +121,8 @@ export default abstract class Player {
     this.KingSideCastle(7, 6, 5, [6, 5]); // blackPlayer Castle
   }
 
-  private CanCastle(
+
+  protected CanCastle(
     rookPos: number,
     kingCastlePos: number,
     mustEmptyTile: number[]

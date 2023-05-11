@@ -11,8 +11,10 @@ import MoveStatus from '../services/move/MoveStatus';
 import PromotedBox from '../components/PromotedBox';
 import MinMax from '../services/Ai/MinMAx';
 import Btn from './Btn';
-const notionXKeys = ["A", "B", "C", "D", "E", "F", "G", "H"],
-  notionYKeys = ["1", "2", "3", "4", "5", "6", "7", "8"];
+import {GiPreviousButton, GiNextButton} from "react-icons/gi";
+import FenInput from './FenInput';
+// const notionXKeys = ["A", "B", "C", "D", "E", "F", "G", "H"],
+//   notionYKeys = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
 
 type ChessGameState = {
@@ -20,6 +22,7 @@ type ChessGameState = {
   selectedLegalMoves: number[];
   promotedBox: boolean,
   promotedMove: Move,
+  fenText?:string,
 }
 
 type ChessGameProps = {
@@ -45,7 +48,9 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
       selectedLegalMoves: [],
       promotedBox: false,
       promotedMove: null,
+      fenText:'',
     }
+
   }
 
   // aiPlay(ai:MinMax){
@@ -62,7 +67,7 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
 
 
   move(currPosition: number, candidatePosition: number) {
-    if(this.state.chessBoard.currPlayer.isInCheckMate()){
+    if(this.state.chessBoard.isGameOver){
       console.log(MoveStatus.getState(3));
     }
     let pieceLegalMoves: Move[] = this.state.chessBoard.currPlayer.legalMoves;
@@ -75,7 +80,9 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
         }else{
           let moveTransition = this.state.chessBoard.currPlayer.makMove(move);
           if (moveTransition.status == MoveStatus.isDone) {
-            this.setState({ chessBoard: moveTransition.board });
+            this.setState({ chessBoard: moveTransition.board, fenText: moveTransition
+                  .board.getFenFormat()});
+
             break;
           }
         }
@@ -104,8 +111,22 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
   }
 
   setTileColor(i:number){
+    if(this.state.selectedLegalMoves.indexOf(i) != -1)
+      return "#ff0";
     return  (Math.round(i + ((i + 4) / 8)) % 2) == 0 ? this.gameSetting.theme.getBoardColor().dark : this.gameSetting.theme.getBoardColor().light
   }
+
+  readFenFile(fen: string){
+    console.log(fen);
+    if(Board.isFenFormat(fen)){
+      this.setState({chessBoard: Board.fenToBoard(fen)})
+    }
+    
+  }
+
+  prevMove(){}
+
+  nextMove(){}
 
   render() {
     return (
@@ -121,48 +142,65 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
           )
         }
         <div className='chess-engine'>
-            <div className='fen-input flex  items-center gap-2'>
-              <input className='input my-5 grow' placeholder='FEN file formate'/>
-              <Btn className='secondary-btn bg-sky-800 px-4 w-[200px]'>Apply</Btn>
-            </div>
-            <div className='chess-board-engine flex gap-2'>
-              <div className='chess-board grid'>
-                <DndProvider backend={HTML5Backend}>
-                  {
-                    this.state.chessBoard.getGameBoard.map((e, i) => {
-                      return <TilePiece
-                        key={i + 1}
-                        pieceProps={{
-                          width: "60px",
-                          height: "60px",
-                          color: this.setTileColor(i),
-                          index: i,
-                        }}
-                        movFunction={this.move.bind(this)}
-                      >
-                        <ChessPiece
-                          position={i}
-                          piece={e.getPiece()}
-                          onDragStart={this.onDragStart.bind(this)}
-                          onDragEnd = {this.onDragEnd.bind(this)}
-                          image={e.isOccupied() ? this.gameSetting.theme.getPieceImage(e.getPiece().toString()) : ''}
-                        ></ChessPiece>
-                      </TilePiece>
-                    })
-                  }
-                </DndProvider>
+          <FenInput defaultValue={this.state.fenText} onApply={this.readFenFile.bind(this)}/>
+          <div className='chess-board-engine flex gap-2'>
+            <div className='players flex flex-col justify-between items-center'>
+              <div className='player-one'>
+                <img className='user-image' src='./assets/users/ai.png'></img>
+                <div className='user-name'>AI</div>
               </div>
-              <div className='moves-history '>
-                <textarea
-                className
-                  ='input h-full'
-                placeholder='Moves Log'
-                disabled
-              ></textarea>
+              
+              <div className='player-two'>
+                <img className='user-image' src='./assets/users/ai.png'></img>
+                <div className='user-name'>AI</div>
+              </div>
+            </div>
+            <div className='chess-board grid'>
+              <DndProvider backend={HTML5Backend}>
+                {
+                  this.state.chessBoard.getGameBoard.map((e, i) => {
+                    return <TilePiece
+                      key={i + 1}
+                      pieceProps={{
+                        width: "60px",
+                        height: "60px",
+                        color: this.setTileColor(i),
+                        index: i,
+                      }}
+                      movFunction={this.move.bind(this)}
+                    >
+                      <ChessPiece
+                        position={i}
+                        piece={e.getPiece()}
+                        onDragStart={this.onDragStart.bind(this)}
+                        onDragEnd = {this.onDragEnd.bind(this)}
+                        image={e.isOccupied() ? this.gameSetting.theme.getPieceImage(e.getPiece().toString()) : ''}
+                      ></ChessPiece>
+                    </TilePiece>
+                  })
+                }
+              </DndProvider>
+            </div>
+            <div className='moves-history'>
+              <textarea
+              className
+                ='input h-full'
+              placeholder='Moves Log'
+              disabled>
+              </textarea>
+              <div className='controllers'>
+                <ul className='flex list-none gap-2 justify-center items-center text-3xl text-slate-300 '>
+                  <li>
+                    <Btn onClick={this.prevMove.bind(this)}><GiPreviousButton title="Previous Move" /></Btn>
+                  </li>
+                  <li>
+                    <Btn onClick={this.nextMove.bind(this)}><GiNextButton title="Next Move"/></Btn>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
-          
+        </div>
       </>
     );
   }

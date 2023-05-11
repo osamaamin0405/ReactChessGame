@@ -14,7 +14,7 @@ export default abstract class Piece {
   protected _alliance: Alliance;
   protected abstract _value: number;
 
-  constructor(
+  protected constructor(
     piecePosition: number,
     alliance: Alliance,
     isFirstMove: boolean = true
@@ -33,7 +33,7 @@ export default abstract class Piece {
   }
 
   XYPosition(): [string, number] {
-    const row = Math.floor(this.position / 8) + 1;
+    const row = 8 - Math.floor(this.position / 8) ;
     const col = String.fromCharCode(97 + (this.position % 8));
     return [col, row];
   }

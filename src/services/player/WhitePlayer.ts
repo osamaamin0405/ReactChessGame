@@ -19,4 +19,14 @@ export default class WhitePlayer extends Player {
   public getAlliance(): Alliance {
     return Board.Alliances.white;
   }
+
+  public getAvailableCastle():string{
+    let castlingString:string ="";
+    const [whiteQueenCastles, whiteKingCastle] = [ this.CanCastle(56, 58,  [57, 58, 59]) ,
+        this.CanCastle(63, 62,  [61, 62])];
+
+    if(whiteKingCastle) castlingString += "K"
+    if(whiteQueenCastles) castlingString += "Q"
+    return castlingString;
+  }
 }

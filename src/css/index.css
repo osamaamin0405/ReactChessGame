@@ -114,3 +114,11 @@
   justify-content: center;
   align-content: center;
 }
+
+.user-image {
+  @apply w-14 h-14 rounded p-1 border-2;
+}
+
+.user-name {
+  @apply text-lg text-slate-300 text-center mt-2;
+}

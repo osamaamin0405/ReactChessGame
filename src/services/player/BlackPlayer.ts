@@ -19,4 +19,18 @@ export default class BlackPlayer extends Player {
   public getAlliance(): Alliance {
     return Board.Alliances.black;
   }
+
+
+  public getAvailableCastle():string{
+    let castlingString: string = "",
+      [blackQueenCastle, blackKingCastle] = [
+        this.CanCastle(0, 2,  [1, 2, 3]),
+        this.CanCastle(7, 6, [6, 5]),
+      ];
+
+    if(blackKingCastle) castlingString += "k"
+    if(blackQueenCastle) castlingString += 'q'
+    return castlingString
+  }
+
 }

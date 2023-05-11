@@ -11,26 +11,27 @@ import Tile from "./Tile";
 
 export default class Board {
   private builder: Builder;
-  private gameBoard: Tile[];
-  private _enPassantPawn: Piece;
+  private readonly gameBoard: Tile[];
+  private readonly _enPassantPawn: Piece;
   private Alliances: { white: Alliance; black: Alliance };
   static Alliances: { white: Alliance; black: Alliance } = {
     white: new White(),
     black: new Black(),
   };
-  private _whitePieces: Piece[];
-  private _blackPieces: Piece[];
-  private _whitePlayer: Player;
-  private _blackPlayer: Player;
-  private _currPlayer: Player;
-  private _whiteLegalMoves: Move[];
-  private _blackLegalMoves: Move[];
+  private readonly _whitePieces: Piece[];
+  private readonly _blackPieces: Piece[];
+  private readonly _whitePlayer: Player;
+  private readonly _blackPlayer: Player;
+  private readonly _currPlayer: Player;
+  private readonly _whiteLegalMoves: Move[];
+  private readonly _blackLegalMoves: Move[];
 
   constructor(builder: Builder) {
     this.builder = builder;
     this.gameBoard = this.createGameBoard();
     this.Alliances = Board.Alliances;
     this._enPassantPawn = builder._enPassantPawn;
+    console.log(this.enPassantPawn);
     this._whitePieces = this.getActivePieces(this.Alliances.white);
     this._blackPieces = this.getActivePieces(this.Alliances.black);
     this._whiteLegalMoves = this.getLegalMoves(this._whitePieces);
@@ -63,8 +64,8 @@ export default class Board {
   public toString(): string {
     let gameBoard: string = "";
     for (let i = 0; i < BoardUtils.TILES_CELLS; i++) {
-      gameBoard += ` ${this.gameBoard[i].getPiece()?.toString() || "_"} `;
-      if ((i + 1) % BoardUtils.NUM_COLS == 0) gameBoard += `\n`;
+      gameBoard += `${this.gameBoard[i].getPiece()?.toString() || "_"}`;
+      if ((i + 1) % BoardUtils.NUM_COLS == 0) gameBoard += "\n";
     }
     return gameBoard;
   }
@@ -140,6 +141,72 @@ export default class Board {
 
   getTile(_candidateDistance: number): Tile {
     return this.gameBoard[_candidateDistance];
+  }
+
+  static isFenFormat(fen: string) {
+    return fen.split(" ").length === 6;
+
+  }
+
+  static fenToBoard(fen: string): Board {
+    // Split FEN string into separate components
+    const fenParts: string[] = fen.split(" ");
+
+    if (!Board.isFenFormat(fen)) throw new Error("Invalid Fen format ");
+
+    // Extract board
+    const boardFen: string = fenParts[0].split("/").join("");
+    const activeColor: string = fenParts[1];
+    const enPassantPawn: string = fenParts[3].split("").join("");
+    const builder: Builder = new Builder();
+    // Convert board FEN to 1D array
+    let piecePos: number = 0;
+    for (let i = 0; i < boardFen.length; i++) {
+      const char: string = boardFen.charAt(i);
+      if (isNaN(parseInt(char))) {
+        //push pieces into builder array
+        // console.log(builder.createPiece(char, i), char);
+        const [col, row] = BoardUtils.XYPosition(piecePos),
+          piece: Piece = builder.createPiece(char, piecePos),
+            notionIndex = col + (row +1);
+        console.log(notionIndex, enPassantPawn);
+        if (notionIndex == enPassantPawn && piece.name.toUpperCase() == "P") builder.setEnPassantPawn(piece);
+        builder.setPiece(piece);
+        piecePos += 1;
+      } else {
+        piecePos += parseInt(char);
+      }
+      // console.log(piecePos);
+    }
+    builder.setMoveMaker(
+      activeColor == "w" ? Board.Alliances.white : Board.Alliances.black
+    );
+    return builder.build();
+  }
+
+  getFenFormat():string{
+    let fenFile:string = this.toString().split("\n").join("/"),
+      castleString:string =  this.whitePlayer.getAvailableCastle() + this.blackPlayer.getAvailableCastle();
+    fenFile = fenFile
+      .replaceAll("________", "8")
+      .replaceAll("_______", "7")
+      .replaceAll("______", "6")
+      .replaceAll("_____", "5")
+      .replaceAll("____", "4")
+      .replaceAll("___", "3")
+      .replaceAll("__", "2")
+      .replaceAll("_", "1");
+    fenFile = fenFile.substring(0, fenFile.length-1);
+
+
+    fenFile += this.currPlayer.getAlliance().isWhite ? " w " : " b ";
+    fenFile += castleString == "" ? "-" : castleString;
+    fenFile += this.enPassantPawn != null ?
+            " " + BoardUtils.XYPosition(this.enPassantPawn.position + (8) * this.currPlayer.getAlliance().getDirection()).join("")
+            : " -";
+    fenFile += " 0 1";
+
+    return fenFile;
   }
 
   public get currPlayer(): Player {

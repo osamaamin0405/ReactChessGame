@@ -38,4 +38,10 @@ export default abstract class BoardUtils {
   public static isValidTileCoordinates(coordinates: number) {
     return 0 <= coordinates && coordinates < BoardUtils.TILES_CELLS;
   }
+
+  static XYPosition(pos: number): [string, number] {
+    const row = 8 - Math.floor(pos / 8);
+    const col = String.fromCharCode(97 + (pos % 8));
+    return [col, row];
+  }
 }
