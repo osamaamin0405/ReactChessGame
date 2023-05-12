@@ -10,12 +10,11 @@ import Move from '../services/move/Move';
 import MoveStatus from '../services/move/MoveStatus';
 import PromotedBox from '../components/PromotedBox';
 import MinMax from '../services/Ai/MinMAx';
-import Btn from './Btn';
-import {GiPreviousButton, GiNextButton} from "react-icons/gi";
-import FenInput from './FenInput';
-// const notionXKeys = ["A", "B", "C", "D", "E", "F", "G", "H"],
-//   notionYKeys = ["1", "2", "3", "4", "5", "6", "7", "8"];
-
+import FenInput from '../components/FenInput';
+import {PlayerInfo} from "../components/PlayerInfo";
+import {Controllers} from "../components/Controllers";
+import {HistoryLink} from "../components/HistoryLink";
+import {HistoryList} from "../components/HistoryList";
 
 type ChessGameState = {
   chessBoard: Board;
@@ -23,6 +22,7 @@ type ChessGameState = {
   promotedBox: boolean,
   promotedMove: Move,
   fenText?:string,
+  historyMoves?: string[][];
 }
 
 type ChessGameProps = {
@@ -49,22 +49,13 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
       promotedBox: false,
       promotedMove: null,
       fenText:'',
+      historyMoves: [],
     }
-
   }
 
-  // aiPlay(ai:MinMax){
-  //   let newBoard = this.state.chessBoard;
-  //   while(!newBoard.isGameOver){
-  //     const bestMove = ai.execute(newBoard);
-  //     const moveTransition = newBoard.currPlayer.makMove(bestMove);
-  //     if(moveTransition.status == MoveStatus.isDone){
-
-  //       newBoard = moveTransition.board;
-  //     }
-  //   }
-  // }
-
+  componentDidMount() {
+    this.setState({fenText: this.state.chessBoard.getFenFormat()})
+  }
 
   move(currPosition: number, candidatePosition: number) {
     if(this.state.chessBoard.isGameOver){
@@ -80,9 +71,7 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
         }else{
           let moveTransition = this.state.chessBoard.currPlayer.makMove(move);
           if (moveTransition.status == MoveStatus.isDone) {
-            this.setState({ chessBoard: moveTransition.board, fenText: moveTransition
-                  .board.getFenFormat()});
-
+            this.updateMoveStates(moveTransition.board, move);
             break;
           }
         }
@@ -91,6 +80,12 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
 
   }
 
+
+  updateMoveStates(newBoard: Board, move: Move){
+    const fenText: string = newBoard.getFenFormat();
+    this.setState({chessBoard: newBoard, fenText:fenText});
+    this.state.historyMoves.push([move.toString(), fenText]);
+  }
 
   promoterMove(pieceName: string){
     let promotedMove: Move = this.state.promotedMove;
@@ -111,9 +106,22 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
   }
 
   setTileColor(i:number){
-    if(this.state.selectedLegalMoves.indexOf(i) != -1)
-      return "#ff0";
-    return  (Math.round(i + ((i + 4) / 8)) % 2) == 0 ? this.gameSetting.theme.getBoardColor().dark : this.gameSetting.theme.getBoardColor().light
+    const isWhite:boolean       = (Math.round(i + ((i + 4) / 8)) % 2) != 0,
+          whiteKingPos :number  = this.state.chessBoard.whitePlayer.king.position,
+          blackKingPos :number  = this.state.chessBoard.blackPlayer.king.position,
+          whiteInCheck :boolean = this.state.chessBoard.whitePlayer.isInCheck(),
+          blackInCheck :boolean = this.state.chessBoard.blackPlayer.isInCheck(),
+          whiteColor:string     = " bg-slate-100 ",
+          blackColor:string     = " bg-slate-500 ",
+          isOccupiedPos:boolean  = this.state.chessBoard.getTile(i).isOccupied();
+    let returnedClasses: string = (isWhite ? whiteColor : blackColor)
+    if(this.state.selectedLegalMoves.indexOf(i) != -1){
+      if(isOccupiedPos)returnedClasses += " occupied-bg "
+      else returnedClasses += " dot-hint ";
+    }
+    if(whiteInCheck && i == whiteKingPos)               returnedClasses += " check-color ";
+    if(blackInCheck && i == blackKingPos)               returnedClasses += " check-color ";
+    return returnedClasses;
   }
 
   readFenFile(fen: string){
@@ -145,15 +153,8 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
           <FenInput defaultValue={this.state.fenText} onApply={this.readFenFile.bind(this)}/>
           <div className='chess-board-engine flex gap-2'>
             <div className='players flex flex-col justify-between items-center'>
-              <div className='player-one'>
-                <img className='user-image' src='./assets/users/ai.png'></img>
-                <div className='user-name'>AI</div>
-              </div>
-              
-              <div className='player-two'>
-                <img className='user-image' src='./assets/users/ai.png'></img>
-                <div className='user-name'>AI</div>
-              </div>
+              <PlayerInfo name={"AI"} />
+              <PlayerInfo name={"Human"} />
             </div>
             <div className='chess-board grid'>
               <DndProvider backend={HTML5Backend}>
@@ -164,9 +165,9 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
                       pieceProps={{
                         width: "60px",
                         height: "60px",
-                        color: this.setTileColor(i),
                         index: i,
                       }}
+                      className={this.setTileColor(i)}
                       movFunction={this.move.bind(this)}
                     >
                       <ChessPiece
@@ -181,23 +182,17 @@ export default class Home extends Component<ChessGameProps, ChessGameState> {
                 }
               </DndProvider>
             </div>
-            <div className='moves-history'>
-              <textarea
-              className
-                ='input h-full'
-              placeholder='Moves Log'
-              disabled>
-              </textarea>
-              <div className='controllers'>
-                <ul className='flex list-none gap-2 justify-center items-center text-3xl text-slate-300 '>
-                  <li>
-                    <Btn onClick={this.prevMove.bind(this)}><GiPreviousButton title="Previous Move" /></Btn>
-                  </li>
-                  <li>
-                    <Btn onClick={this.nextMove.bind(this)}><GiNextButton title="Next Move"/></Btn>
-                  </li>
-                </ul>
+            <div className='moves-history w-[200px]'>
+              <div
+              className="h-full w-full border-2 border-slate-500 rounded p-2 text-slate-300 select-none"
+              >
+                {
+                  this.state.historyMoves.length == 0
+                    ? 'Moves History'
+                    : <HistoryList list={this.state.historyMoves} onClickItem={this.readFenFile.bind(this)} />
+                }
               </div>
+              <Controllers nextEvent={this.nextMove.bind(this)} prevEvent={this.prevMove.bind(this)} />
             </div>
           </div>
         </div>

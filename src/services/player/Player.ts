@@ -13,7 +13,7 @@ export default abstract class Player {
   private _isInCheck: boolean;
   private _isCastled: boolean = false;
   public abstract  getAvailableCastle(): string;
-  constructor(board: Board, legalMoves: Move[], opponentLegalMoves: Move[]) {
+  protected constructor(board: Board, legalMoves: Move[], opponentLegalMoves: Move[]) {
     this._board = board;
     this._legalMoves = legalMoves;
     this._opponentLegalMoves = opponentLegalMoves;
@@ -42,7 +42,7 @@ export default abstract class Player {
   ): Move[] {
     const attacksMove: Move[] = [];
     for (let move of opponentLegalMoves) {
-      if (position === move.getDestinationCoordinates()) {
+      if (position === move.destinationCoordinate) {
         attacksMove.push(move);
       }
     }

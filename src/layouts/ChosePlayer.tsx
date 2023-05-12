@@ -1,5 +1,5 @@
-import Btn from "./Btn";
-import Switch from "./Switch";
+import Btn from "../components/Btn";
+import Switch from "../components/Switch";
 import { useState} from "react";
 
 type props =  {

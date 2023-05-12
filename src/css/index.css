@@ -122,3 +122,40 @@
 .user-name {
   @apply text-lg text-slate-300 text-center mt-2;
 }
+
+.dot-hint,.check-color, .occupied-bg{
+  position: relative;
+}
+
+.occupied-bg > div , .check-color>div{
+  position: absolute;
+  z-index: 100;
+}
+
+.dot-hint:before{
+    content:  '';
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    transform: translate(-50%, 100%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    @apply bg-blue-400;
+}
+
+.check-color:before, .occupied-bg:before{
+  content:  '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.check-color:before{
+  @apply bg-red-950;
+}
+
+.occupied-bg:before{
+  @apply bg-amber-600;
+}
+

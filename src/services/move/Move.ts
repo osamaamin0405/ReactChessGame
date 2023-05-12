@@ -1,6 +1,7 @@
 import Piece from "../piece/Piece";
 import Board from "../board/Board";
 import Builder from "../board/Builder";
+import BoardUtils from "../board/BoardUtils";
 
 export default abstract class Move {
   protected board: Board;
@@ -8,16 +9,15 @@ export default abstract class Move {
   protected distanceCoordinates: number;
   public type: string;
   promotedPiece: string = "q";
+  protected _name:string;
   constructor(board: Board, piece: Piece, distanceCoordinates: number) {
     this.board = board;
     this._piece = piece;
     this.distanceCoordinates = distanceCoordinates;
     this.type = "";
+    this._name = piece.name + BoardUtils.XYPosition(distanceCoordinates).join("");
   }
 
-  getDestinationCoordinates(): number {
-    return this.distanceCoordinates;
-  }
   get destinationCoordinate(): number {
     return this.distanceCoordinates;
   }
@@ -49,7 +49,6 @@ export default abstract class Move {
     for (let piece of this.board.currPlayer.getOpponent().getActivePieces()) {
       builder.setPiece(piece);
     }
-    //TODO: implement actually moving the piece
     builder.setPiece(
       this._piece.movePiece(this.distanceCoordinates, this._piece.alliance)
     );
@@ -68,6 +67,10 @@ export default abstract class Move {
     const builder = this.executeBuilder();
     return builder.build();
   }
+
+  toString(){
+    return this._name;
+  }
 }
 
 export class MajorMove extends Move {
@@ -79,6 +82,7 @@ export class MajorMove extends Move {
 export class AttackMove extends Move {
   constructor(board: Board, piece: Piece, distanceCoordinates: number) {
     super(board, piece, distanceCoordinates);
+    this._name = +  piece.name + "x" + BoardUtils.XYPosition(distanceCoordinates).join("")
   }
   isAttack(): boolean {
     return true;
@@ -92,13 +96,14 @@ export class AttackMove extends Move {
 export class PawnMove extends Move {}
 
 export class PawnAttack extends AttackMove {
-  constructor(board: Board, piece: Piece, distanceCoordinate: number) {
-    super(board, piece, distanceCoordinate);
+  constructor(board: Board, piece: Piece, distanceCoordinates: number) {
+    super(board, piece, distanceCoordinates);
+    this._name = BoardUtils.XYPosition(piece.position)[0] +  "x" + BoardUtils.XYPosition(distanceCoordinates).join("")
   }
 }
 
 export class PawnEnPassantMove extends PawnAttack {
-  private attackedPawn: Piece;
+  private readonly attackedPawn: Piece;
   constructor(
     board: Board,
     piece: Piece,
@@ -175,34 +180,38 @@ export class CastleMove extends Move {
   }
 }
 
-export class KingSideCastleMove extends CastleMove {}
-
-export class QueenSideCastleMove extends CastleMove {}
-
-export class FactoryMove {
-  constructor() {
-    throw new Error("not instantiable");
-  }
-
-  static createMove(
-    board: Board,
-    currCoordinate: number,
-    distanceCoordinate: number
-  ): Move {
-    for (let move of board.getAllLegalMove) {
-      if (
-        move.currCoordinate === currCoordinate &&
-        move.destinationCoordinate === distanceCoordinate
-      ) {
-        return move;
-      }
-    }
-    throw new Error("Invalid Move Coordinates");
-  }
-
-  public factory() {
-    throw new Error("FactoryMove");
-  }
+export class KingSideCastleMove extends CastleMove {
+  _name = "o-o"
 }
+
+export class QueenSideCastleMove extends CastleMove {
+  _name = "o-o-o"
+}
+
+// export class FactoryMove {
+//   constructor() {
+//     throw new Error("not instantiable");
+//   }
+//
+//   static createMove(
+//     board: Board,
+//     currCoordinate: number,
+//     distanceCoordinate: number
+//   ): Move {
+//     for (let move of board.getAllLegalMove) {
+//       if (
+//         move.currCoordinate === currCoordinate &&
+//         move.destinationCoordinate === distanceCoordinate
+//       ) {
+//         return move;
+//       }
+//     }
+//     throw new Error("Invalid Move Coordinates");
+//   }
+//
+//   public factory() {
+//     throw new Error("FactoryMove");
+//   }
+// }
 
 // export class NullMove extends Move {}

@@ -32,7 +32,7 @@ export default class App extends Component<{}, AppState> {
   }
 
   onChose(playerColor: string, PlayerType: string){
-    const isAI:boolean = PlayerType == "AI" ? true: false;
+    const isAI:boolean = PlayerType == "AI";
     this.setState({
       isAI: isAI,
       playerOne: playerColor,

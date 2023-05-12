@@ -1,10 +1,3 @@
-type BoardPiece = {
-  value?: ChessPiece;
-  pieceProps: BoardPieceProps;
-  children: React.Children;
-  movFunction: CallableFunction;
-  onPromote?: CallableFunction;
-};
 
 type ThemeName =
   | "brown_shadow"
@@ -19,7 +12,6 @@ type PieceName = "b" | "n" | "p" | "q" | "r" | "k" | undefined;
 type BoardPieceProps = {
   width: string;
   height: string;
-  color: string;
   index: number;
 };
 

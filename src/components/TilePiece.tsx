@@ -1,5 +1,14 @@
 import { useDrop } from "react-dnd/dist/hooks";
 
+type BoardPiece = {
+    value?: ChessPiece;
+    pieceProps: BoardPieceProps;
+    children: JSX.Element;
+    movFunction: CallableFunction;
+    onPromote?: CallableFunction;
+    className?: string;
+};
+
 export default function TilePiece(props: BoardPiece) {
   let pieceProps = props.pieceProps
   let position = pieceProps.index;
@@ -29,9 +38,8 @@ export default function TilePiece(props: BoardPiece) {
       style={{
         width: pieceProps.width,
         height: pieceProps.height,
-        backgroundColor: pieceProps.color,
       }}
-      className="chess-board-pace"
+      className={"chess-board-pace " + props.className ?? ''}
     >{value}</div>
   );
 }

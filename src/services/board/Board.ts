@@ -31,7 +31,6 @@ export default class Board {
     this.gameBoard = this.createGameBoard();
     this.Alliances = Board.Alliances;
     this._enPassantPawn = builder._enPassantPawn;
-    console.log(this.enPassantPawn);
     this._whitePieces = this.getActivePieces(this.Alliances.white);
     this._blackPieces = this.getActivePieces(this.Alliances.black);
     this._whiteLegalMoves = this.getLegalMoves(this._whitePieces);
@@ -169,7 +168,6 @@ export default class Board {
         const [col, row] = BoardUtils.XYPosition(piecePos),
           piece: Piece = builder.createPiece(char, piecePos),
             notionIndex = col + (row +1);
-        console.log(notionIndex, enPassantPawn);
         if (notionIndex == enPassantPawn && piece.name.toUpperCase() == "P") builder.setEnPassantPawn(piece);
         builder.setPiece(piece);
         piecePos += 1;
