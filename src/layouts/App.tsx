@@ -11,11 +11,11 @@ export default class App extends Component<{}, AppState> {
 
   constructor(props: {}){
     super(props);
-    this.state = {
-      chosePlayer: true,
-      playerOne: "",
-      isAI: false
-    };
+    // this.state = {
+    //   chosePlayer: true,
+    //   playerOne: "",
+    //   isAI: false
+    // };
     this.onChose = this.onChose.bind(this);
   }
 
