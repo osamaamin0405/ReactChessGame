@@ -82,7 +82,7 @@ export class MajorMove extends Move {
 export class AttackMove extends Move {
   constructor(board: Board, piece: Piece, distanceCoordinates: number) {
     super(board, piece, distanceCoordinates);
-    this._name = +  piece.name + "x" + BoardUtils.XYPosition(distanceCoordinates).join("")
+    this._name = piece.name + "x" + BoardUtils.XYPosition(distanceCoordinates).join("")
   }
   isAttack(): boolean {
     return true;
